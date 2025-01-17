@@ -1,5 +1,37 @@
+from openai import OpenAI
+from langsmith import traceable
+from langsmith.wrappers import wrap_openai
+# Importing neccessary modules
 import streamlit as st
 from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+import os
+from dotenv import load_dotenv
+from datetime import datetime
+import time
+
+
+load_dotenv()
+
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGSMITH_API_KEY")
+os.environ["LANGCHAIN_PROJECT"] = os.getenv("LANGSMITH_PROJECT")
+
+
+
+
+
+########################################################
+
+
+
+
+import streamlit as st
+from langchain_openai import ChatOpenAI
+
+
 
 # from langchain_together import ChatTogether
 from uuid import uuid4
@@ -93,6 +125,8 @@ if uploaded_file is not None:
     text = extract_pdf_text(uploaded_file)
     if user_input:
         user_input += text
+else:
+    text=None
 
 for sender, message in st.session_state.chat_history:
     with st.chat_message("user" if sender == "You" else "assistant"):
@@ -106,10 +140,24 @@ if user_input:
     with st.chat_message("assistant"):
         response_placeholder = st.empty()
         full_response = ""
-        for response in bot_func(bot, user_input, session_id=str(uuid4()),puplic_doc=doc):
+        session_id=str(uuid4())
+        time_var=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        start_time = time.time()
+
+        for response in bot_func(bot, user_input, session_id=session_id,puplic_doc=doc):
             full_response += response
             response_placeholder.markdown(f"{full_response}")
-        print(doc)
+        
+        end_time = time.time()
+        latency = end_time - start_time
+
+        @traceable(
+        name="first try",
+        run_type="retriever",
+        metadata={"ls_provider": "SG_provider", "ls_model_name": "filtiration-Bot"}
+        )
+        def chat_model(user_input,run_id,time,latency):
+            return doc,full_response
 
     st.session_state.chat_history.append(("You", f"{user_input_2}"))
     st.session_state.chat_history.append((selected_bot, f"{full_response}"))
