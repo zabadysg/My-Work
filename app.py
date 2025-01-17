@@ -9,7 +9,7 @@ import os
 from langchain_community.chat_message_histories import StreamlitChatMessageHistory
 from utils.functions import *
 
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.0,api_key='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')
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.0)
 msgs = StreamlitChatMessageHistory(key="langchain_messages")
 BAAI = "BAAI/bge-base-en-v1.5"
 L6 = "sentence-transformers/all-MiniLM-L6-v2"
