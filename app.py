@@ -151,7 +151,13 @@ if user_input:
         end_time = time.time()
         latency = end_time - start_time
 
-
+    @traceable(
+    name="first try",
+    run_type="retriever",
+    metadata={"ls_provider": "SG_provider", "ls_model_name": "filtiration-Bot"}
+    )
+    def chat_model(user_input,run_id,time_var,latency):
+        return doc,full_response
 
     st.session_state.chat_history.append(("You", f"{user_input_2}"))
     st.session_state.chat_history.append((selected_bot, f"{full_response}"))
