@@ -39,11 +39,9 @@ import pandas as pd
 import base64
 import os
 from langchain_community.chat_message_histories import StreamlitChatMessageHistory
-from langchain_together import ChatTogether
-
 from utils.functions import *
 
-llm = ChatTogether(model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",api_key="f3cd19b2691d15ac59cf87bda7b7e5b22e94e65a201479c9da5ee23547e8cb68")
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.0)
 msgs = StreamlitChatMessageHistory(key="langchain_messages")
 BAAI = "BAAI/bge-base-en-v1.5"
 L6 = "sentence-transformers/all-MiniLM-L6-v2"
