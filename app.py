@@ -132,32 +132,34 @@ for sender, message in st.session_state.chat_history:
     with st.chat_message("user" if sender == "You" else "assistant"):
         st.markdown(message)
 
-if user_input:
-    doc={}
-    with st.chat_message("user"):
-        st.markdown(f"{user_input_2}")
+@traceable(
+name="first try",
+run_type="retriever",
+metadata={"ls_provider": "SG_provider", "ls_model_name": "filtiration-Bot"}
+)
+def testba2a(user_input,run_id):
+    if user_input:
+        doc={}
+        with st.chat_message("user"):
+            st.markdown(f"{user_input_2}")
 
-    with st.chat_message("assistant"):
-        response_placeholder = st.empty()
-        full_response = ""
-        session_id=str(uuid4())
-        time_var=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        start_time = time.time()
+        with st.chat_message("assistant"):
+            response_placeholder = st.empty()
+            full_response = ""
+            session_id=str(uuid4())
+            time_var=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            start_time = time.time()
 
-        for response in bot_func(bot, user_input, session_id=session_id,puplic_doc=doc):
-            full_response += response
-            response_placeholder.markdown(f"{full_response}")
+            for response in bot_func(bot, user_input, session_id=session_id,puplic_doc=doc):
+                full_response += response
+                response_placeholder.markdown(f"{full_response}")
+            
+            end_time = time.time()
+            latency = end_time - start_time
+            return time_var,latency,doc,full_response
         
-        end_time = time.time()
-        latency = end_time - start_time
 
-    @traceable(
-    name="first try",
-    run_type="retriever",
-    metadata={"ls_provider": "SG_provider", "ls_model_name": "filtiration-Bot"}
-    )
-    def chat_model(user_input,run_id,time_var,latency):
-        return doc,full_response
+
 
     st.session_state.chat_history.append(("You", f"{user_input_2}"))
     st.session_state.chat_history.append((selected_bot, f"{full_response}"))
