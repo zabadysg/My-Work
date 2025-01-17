@@ -20,6 +20,7 @@ os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGSMITH_API_KEY")
 os.environ["LANGCHAIN_PROJECT"] = os.getenv("LANGSMITH_PROJECT")
 
 
+openai_client = wrap_openai(OpenAI())
 
 
 
