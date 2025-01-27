@@ -151,10 +151,9 @@ if st.session_state.chat_history:
     )
 
     if feedback:
-        if feedback is not None:
-            client.create_feedback(
-                run_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id),
-                key="User Feedback",
-                score=feedback['score'],
-                comment=feedback['text'],
-            )
+        client.create_feedback(
+            run_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id),
+            key="User Feedback",
+            score=feedback['score'],
+            comment=feedback['text'],
+        )
