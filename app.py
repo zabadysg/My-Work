@@ -1,52 +1,57 @@
-from openai import OpenAI
-from langsmith import traceable
-from langsmith.wrappers import wrap_openai
-# Importing neccessary modules
 import streamlit as st
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+
+from uuid import uuid4
+import uuid
+import pandas as pd
+import base64
+from langchain_community.chat_message_histories import StreamlitChatMessageHistory
+from utils.functions import *
+from utils.customllm import *
+from langsmith import traceable, trace,Client
+from typing import Final
+
+from langchain_together import ChatTogether
+from streamlit_feedback import streamlit_feedback
+
+
+
 import os
 from dotenv import load_dotenv
-from datetime import datetime
-import time
-
-
+# user_id = create_user_id() 
 load_dotenv()
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGSMITH_API_KEY")
-os.environ["LANGCHAIN_PROJECT"] = os.getenv("LANGSMITH_PROJECT")
+os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
+os.environ["LANGCHAIN_PROJECT"] = os.getenv("LANGCHAIN_PROJECT")
+client = Client(api_key='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')
 
 
-openai_client = wrap_openai(OpenAI())
+with st.sidebar:
+    st.header("LLM Settings")
+    
+    # Dropdown for model type selection
+    model_type = st.selectbox("Select LLM Model Type", ["ChatTogether","CustomLLM"])
+    
+    # Slider for temperature
+    temperature = st.slider("Temperature", 0.0, 1.0, 0.0, key="temp_slider") 
+    
+    # Conditional inputs based on model type
+    if model_type == "CustomLLM":
+        api_url = st.text_input("Enter API URL", "http://34.68.15.213:8000/chat_stream", key="api_url")
+        llm = CustomLLM(api_url=api_url)
+    elif model_type == "ChatTogether":
+        model_name = st.text_input("Enter Model Name", "meta-llama/Llama-3.3-70B-Instruct-Turbo", key="model_name")
+        llm = ChatTogether(model=model_name, temperature=temperature,api_key='f3cd19b2691d15ac59cf87bda7b7e5b22e94e65a201479c9da5ee23547e8cb68')
+    
+    # Display the final llm variable
+    st.subheader("LLM Variable")
+    st.code(f"llm = {llm}")
 
-
-
-########################################################
-
-
-
-
-import streamlit as st
-from langchain_openai import ChatOpenAI
-
-
-
-# from langchain_together import ChatTogether
-from uuid import uuid4
-import pandas as pd
-import base64
-import os
-from langchain_community.chat_message_histories import StreamlitChatMessageHistory
-from utils.functions import *
-
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.0)
 msgs = StreamlitChatMessageHistory(key="langchain_messages")
 BAAI = "BAAI/bge-base-en-v1.5"
-L6 = "sentence-transformers/all-MiniLM-L6-v2"
 names, sys_prompt_dirs, vdb_dirs = [], [], []
 embeddings_list = []
+
 
 for dir in os.listdir():
     if os.path.isdir(dir) and dir != "utils" and "." not in dir:
@@ -54,6 +59,7 @@ for dir in os.listdir():
         sys_prompt_dirs.append(f"{dir}/system_prompt.txt")
         vdb_dirs.append(f"{dir}/new_data_path/")
         embeddings_list.append(BAAI)
+
 
 configurations = {
     "name": names,
@@ -69,33 +75,13 @@ df.to_csv("configurations.csv", index=False)
 selected_bot = st.sidebar.selectbox("Choose a bot to interact with:", list(df["name"]))
 st.write(f"{selected_bot} school Bot")
 
-# TODO: MAKE DYNAMIC LOGO
-accepted_extensions = [".png", ".jpg", ".jpeg"]
-
-logo_path = None
-# List all files in the directory
-files = os.listdir(selected_bot)
-
-# Find the first image file with accepted extension
-
-
-
-st.markdown(
-    f"""
-    <div style="display: flex; align-items: center;">
-        <h1>{selected_bot}</h1>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-
 selected_bot_config = df[df["name"] == selected_bot].iloc[0]
 bot = create_bot_for_selected_bot(
     selected_bot_config["embeddings_name"],
     selected_bot_config["vdb_dir"],
     selected_bot_config["sys_prompt_dir"],
     msgs,
+    llm
 )
 
 if "chat_history" not in st.session_state:
@@ -121,43 +107,98 @@ uploaded_file = st.sidebar.file_uploader("Choose your .pdf file", type="pdf")
 user_input = st.chat_input(placeholder="Your message")
 user_input_2 = user_input
 
+
+# session_id = str(uuid4())
+# def session_func():
+#     return session_id
+# session_id_n = session_func()
 if uploaded_file is not None:
     text = extract_pdf_text(uploaded_file)
     if user_input:
         user_input += text
-else:
-    text=None
 
 for sender, message in st.session_state.chat_history:
     with st.chat_message("user" if sender == "You" else "assistant"):
         st.markdown(message)
 
+session_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2))+user_id)
+
 if user_input:
-    doc={}
+    
     with st.chat_message("user"):
         st.markdown(f"{user_input_2}")
 
     with st.chat_message("assistant"):
+
+
+
         response_placeholder = st.empty()
         full_response = ""
-        session_id=str(uuid4())
-        time_var=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        start_time = time.time()
-
-        for response in bot_func(bot, user_input, session_id=session_id,puplic_doc=doc):
-            full_response += response
+        for response in bot_func(bot, user_input, session_id=session_id,langsmith_extra={"run_id":session_id}): 
+            full_response += response 
             response_placeholder.markdown(f"{full_response}")
-        
-        end_time = time.time()
-        latency = end_time - start_time
-
-    @traceable(
-    name="first try",
-    run_type="retriever",
-    metadata={"ls_provider": "SG_provider", "ls_model_name": "filtiration-Bot"}
-    )
-    def chat_model(user_input,run_id,time_var,latency):
-        return doc,full_response
+    
 
     st.session_state.chat_history.append(("You", f"{user_input_2}"))
-    st.session_state.chat_history.append((selected_bot, f"{full_response}"))
+    st.session_state.chat_history.append((selected_bot, f"{full_response}"))  
+
+
+# if st.session_state.chat_history:
+#     with st.form('form'):
+#         st_feed=streamlit_feedback(feedback_type="thumbs", align="flex-start", key='fb_k')
+#         st.form_submit_button('Save feedback')
+
+
+# def fbcb(feedback):
+#     message_id = len(st.session_state.chat_history) - 1
+#     if message_id >= 0:
+#         st.session_state.chat_history[message_id]["feedback"] = feedback    
+
+
+# if st.session_state.chat_history:
+
+#     cols = st.columns([0.1, 1, 1, 6])
+#     with cols[1]:
+#         x=st.button(':thumbsup:', args=('Positive',), key='thumbsup')
+#     with cols[2]:
+#         y=st.button(':thumbsdown:', args=('Negative',), key='thumbsdown')
+#     if x:
+#         print('Positive')
+#     elif y:
+#         print('Negative')
+
+# def create_feedback(x,y):
+#     if x==True and y==False:
+#         client.create_feedback(
+#         run_id=session_id,
+#         key="is_good",
+#         score=True,
+#         )
+
+#     elif x==False and y==True:
+#         client.create_feedback(
+#         run_id=session_id,
+#         key="is_good",
+#         score=False,
+#         )
+
+if st.session_state.chat_history:
+    feedback = None
+    cols = st.columns([0.1, 1, 1, 6])
+    with cols[1]:
+        x = st.button(':thumbsup:', args=('Positive',), key='thumbsup')
+    with cols[2]:
+        y = st.button(':thumbsdown:', args=('Negative',), key='thumbsdown')
+    
+    if x:
+        feedback=1.0
+    elif y:
+        feedback=0.0
+
+    if feedback is not None:
+        client.create_feedback(
+            run_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id),
+            key="is_good",
+            score=feedback,
+        )
+        print(uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id))

@@ -14,13 +14,23 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.chat_message_histories import StreamlitChatMessageHistory
 import PyPDF2
+from utils.customllm import CustomLLM
+from langchain_together import ChatTogether
+from langsmith import traceable, trace
+from uuid import uuid4
 
-# from langchain_together import ChatTogether
-from langchain_openai import ChatOpenAI
+# user_id=str(uuid4())
+# def create_user_id():
+#     return user_id
+
+# control the temprature and the llm model type as input in the streamlit GUI
+
+# llm = ChatTogether(model= "meta-llama/Llama-3.3-70B-Instruct-Turbo", temperature=0.0)
 
 # # for streamlit GUI only
 msgs = StreamlitChatMessageHistory(key="special_app_key")
 
+# llm = CustomLLM(api_url="http://34.68.15.213:8000/chat_stream")
 
 def read_db(filepath: str, embeddings_name):
     """
@@ -35,7 +45,7 @@ def read_db(filepath: str, embeddings_name):
     """
     embeddings = HuggingFaceEmbeddings(model_name=embeddings_name)
     vectordb = Chroma(persist_directory=filepath, embedding_function=embeddings)
-    retreiver = vectordb.as_retriever()
+    retreiver = vectordb.as_retriever(search_kwargs={"k": 8})
 
     # take it as ret
     return retreiver
@@ -99,10 +109,14 @@ def create_rag_chain(sys_prompt_dir, vdb_dir, llm, embeddings_name):
 
 
 def create_bot_for_selected_bot(
-    embeddings, vdb_dir, sys_prompt_dir, msgs: StreamlitChatMessageHistory
+    embeddings, vdb_dir, sys_prompt_dir, msgs: StreamlitChatMessageHistory, llm
 ):
     """Create a bot for the selected configuration."""
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.0)
+
+    # llm = ChatTogether(model= "meta-llama/Llama-3.3-70B-Instruct-Turbo", temperature=0.0)
+    # llm = CustomLLM(api_url="http://34.68.15.213:8000/chat_stream")
+
+
     rag_chain = create_rag_chain(sys_prompt_dir, vdb_dir, llm, embeddings)
     conversational_rag_chain = RunnableWithMessageHistory(
         rag_chain,
@@ -116,14 +130,22 @@ def create_bot_for_selected_bot(
     return conversational_rag_chain
 
 
-def bot_func(rag_chain, user_input, session_id,puplic_doc):
+def _reduce_chunks(chunks: list):
+    all_text = "".join([chunk for chunk in chunks])
+    return all_text
+
+# def feedback(feedback_text):
+#     return feedback_text
+user_id=str(uuid4())
+@traceable(name="zabady",reduce_fn=_reduce_chunks,metadata={"user_id":user_id})
+def bot_func(rag_chain, user_input, session_id):
+
     for chunk in rag_chain.stream(
         {"input": user_input}, config={"configurable": {"session_id": session_id}}
     ):
-        if(type(chunk.get("context"))==list):
-            puplic_doc=chunk.get("context")
         if answer_chunk := chunk.get("answer"):
             yield answer_chunk
+
 
 
 def extract_pdf_text(file_object):
