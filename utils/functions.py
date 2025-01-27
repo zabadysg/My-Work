@@ -32,6 +32,7 @@ msgs = StreamlitChatMessageHistory(key="special_app_key")
 
 # llm = CustomLLM(api_url="http://34.68.15.213:8000/chat_stream")
 
+
 def read_db(filepath: str, embeddings_name):
     """
     Function to read the vector database and assign at is retreiver
@@ -116,7 +117,6 @@ def create_bot_for_selected_bot(
     # llm = ChatTogether(model= "meta-llama/Llama-3.3-70B-Instruct-Turbo", temperature=0.0)
     # llm = CustomLLM(api_url="http://34.68.15.213:8000/chat_stream")
 
-
     rag_chain = create_rag_chain(sys_prompt_dir, vdb_dir, llm, embeddings)
     conversational_rag_chain = RunnableWithMessageHistory(
         rag_chain,
@@ -134,10 +134,13 @@ def _reduce_chunks(chunks: list):
     all_text = "".join([chunk for chunk in chunks])
     return all_text
 
+
 # def feedback(feedback_text):
 #     return feedback_text
-user_id=str(uuid4())
-@traceable(name="zabady",reduce_fn=_reduce_chunks,metadata={"user_id":user_id})
+user_id = str(uuid4())
+
+
+@traceable(name="zabady", reduce_fn=_reduce_chunks, metadata={"user_id": user_id})
 def bot_func(rag_chain, user_input, session_id):
 
     for chunk in rag_chain.stream(
@@ -145,7 +148,6 @@ def bot_func(rag_chain, user_input, session_id):
     ):
         if answer_chunk := chunk.get("answer"):
             yield answer_chunk
-
 
 
 def extract_pdf_text(file_object):

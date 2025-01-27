@@ -7,42 +7,48 @@ import base64
 from langchain_community.chat_message_histories import StreamlitChatMessageHistory
 from utils.functions import *
 from utils.customllm import *
-from langsmith import traceable, trace,Client
+from langsmith import traceable, trace, Client
 from typing import Final
 
 from langchain_together import ChatTogether
 from streamlit_feedback import streamlit_feedback
 
 
-
 import os
 from dotenv import load_dotenv
-# user_id = create_user_id() 
+
+# user_id = create_user_id()
 load_dotenv()
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
 os.environ["LANGCHAIN_PROJECT"] = os.getenv("LANGCHAIN_PROJECT")
-client = Client(api_key='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')
+client = Client(api_key="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")
 
 
 with st.sidebar:
     st.header("LLM Settings")
-    
+
     # Dropdown for model type selection
-    model_type = st.selectbox("Select LLM Model Type", ["ChatTogether","CustomLLM"])
-    
+    model_type = st.selectbox("Select LLM Model Type", ["ChatTogether", "CustomLLM"])
+
     # Slider for temperature
-    temperature = st.slider("Temperature", 0.0, 1.0, 0.0, key="temp_slider") 
-    
+    temperature = st.slider("Temperature", 0.0, 1.0, 0.0, key="temp_slider")
+
     # Conditional inputs based on model type
     if model_type == "CustomLLM":
-        api_url = st.text_input("Enter API URL", "http://34.68.15.213:8000/chat_stream", key="api_url")
+        api_url = st.text_input(
+            "Enter API URL", "http://34.68.15.213:8000/chat_stream", key="api_url"
+        )
         llm = CustomLLM(api_url=api_url)
     elif model_type == "ChatTogether":
-        model_name = st.text_input("Enter Model Name", "meta-llama/Llama-3.3-70B-Instruct-Turbo", key="model_name")
-        llm = ChatTogether(model=model_name, temperature=temperature,api_key='f3cd19b2691d15ac59cf87bda7b7e5b22e94e65a201479c9da5ee23547e8cb68')
-    
+        model_name = st.text_input(
+            "Enter Model Name",
+            "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+            key="model_name",
+        )
+        llm = ChatTogether(model=model_name, temperature=temperature, max_tokens=1)
+
     # Display the final llm variable
     st.subheader("LLM Variable")
     st.code(f"llm = {llm}")
@@ -81,7 +87,7 @@ bot = create_bot_for_selected_bot(
     selected_bot_config["vdb_dir"],
     selected_bot_config["sys_prompt_dir"],
     msgs,
-    llm
+    llm,
 )
 
 if "chat_history" not in st.session_state:
@@ -92,6 +98,7 @@ if "bot_histories" not in st.session_state:
 
 if "selected_bot" not in st.session_state:
     st.session_state.selected_bot = None
+
 
 if selected_bot != st.session_state.selected_bot:
     if st.session_state.selected_bot is not None:  # Save the current bot's chat history
@@ -108,7 +115,6 @@ user_input = st.chat_input(placeholder="Your message")
 user_input_2 = user_input
 
 
-
 if uploaded_file is not None:
     text = extract_pdf_text(uploaded_file)
     if user_input:
@@ -118,35 +124,57 @@ for sender, message in st.session_state.chat_history:
     with st.chat_message("user" if sender == "You" else "assistant"):
         st.markdown(message)
 
-session_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2))+user_id)
+session_id = uuid.uuid5(
+    uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history) / 2)) + user_id
+)
+
 
 if user_input:
-    
+
     with st.chat_message("user"):
         st.markdown(f"{user_input_2}")
 
     with st.chat_message("assistant"):
 
-
-
         response_placeholder = st.empty()
         full_response = ""
-        feedback=None
 
-        for response in bot_func(bot, user_input, session_id=session_id,langsmith_extra={"run_id":session_id}): 
-            full_response += response 
+        for response in bot_func(
+            bot,
+            user_input,
+            session_id=session_id,
+            langsmith_extra={"run_id": session_id},
+        ):
+            full_response += response
             response_placeholder.markdown(f"{full_response}")
-    
 
     st.session_state.chat_history.append(("You", f"{user_input_2}"))
-    st.session_state.chat_history.append((selected_bot, f"{full_response}"))  
-    feedback = streamlit_feedback(feedback_type="thumbs",optional_text_label="[Optional] Please provide an explanation")
+    st.session_state.chat_history.append((selected_bot, f"{full_response}"))
 
+if st.session_state.chat_history:
+    feedback = None
+    cols = st.columns([6, 0.1, 1, 1])
+    with cols[2]:
+        x = st.button(":thumbsup:", args=("Positive",), key="thumbsup")
+    with cols[3]:
+        y = st.button(":thumbsdown:", args=("Negative",), key="thumbsdown")
+    with cols[0]:
+        comment = st.text_area(
+            "", placeholder="(Optional) Leave a comment before selecting your choose:"
+        )
 
-    if feedback:
+    if x:
+        feedback = 1.0
+    elif y:
+        feedback = 0.0
+
+    if feedback is not None:
         client.create_feedback(
-            run_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id),
-            key="User Feedback",
-            score=1 if feedback['score']=='👍' else 0,
-            comment=feedback['text'],
+            run_id=uuid.uuid5(
+                uuid.NAMESPACE_DNS,
+                str((len(st.session_state.chat_history) / 2) - 1) + user_id,
+            ),
+            key="is_good",
+            score=feedback,
+            comment=comment,
         )
