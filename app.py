@@ -140,9 +140,8 @@ if user_input:
     st.session_state.chat_history.append((selected_bot, f"{full_response}"))  
 
 
-
+feedback=None
 if st.session_state.chat_history:
-    feedback=None
     feedback = streamlit_feedback(
         feedback_type="thumbs",
         optional_text_label="[Optional] Please provide an explanation",
