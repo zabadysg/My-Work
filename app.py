@@ -143,44 +143,6 @@ if user_input:
     st.session_state.chat_history.append((selected_bot, f"{full_response}"))  
 
 
-# if st.session_state.chat_history:
-#     with st.form('form'):
-#         st_feed=streamlit_feedback(feedback_type="thumbs", align="flex-start", key='fb_k')
-#         st.form_submit_button('Save feedback')
-
-
-# def fbcb(feedback):
-#     message_id = len(st.session_state.chat_history) - 1
-#     if message_id >= 0:
-#         st.session_state.chat_history[message_id]["feedback"] = feedback    
-
-
-# if st.session_state.chat_history:
-
-#     cols = st.columns([0.1, 1, 1, 6])
-#     with cols[1]:
-#         x=st.button(':thumbsup:', args=('Positive',), key='thumbsup')
-#     with cols[2]:
-#         y=st.button(':thumbsdown:', args=('Negative',), key='thumbsdown')
-#     if x:
-#         print('Positive')
-#     elif y:
-#         print('Negative')
-
-# def create_feedback(x,y):
-#     if x==True and y==False:
-#         client.create_feedback(
-#         run_id=session_id,
-#         key="is_good",
-#         score=True,
-#         )
-
-#     elif x==False and y==True:
-#         client.create_feedback(
-#         run_id=session_id,
-#         key="is_good",
-#         score=False,
-#         )
 
 if st.session_state.chat_history:
     feedback = streamlit_feedback(
@@ -189,32 +151,10 @@ if st.session_state.chat_history:
     )
 
     if feedback:
-        st.write(feedback["score"])
-    # feedback = None
-    # FB_text = None
-    # cols = st.columns([0.1, 1, 1, 6])
-    # with cols[1]:
-    #     x = st.button(':thumbsup:', args=('Positive',), key='thumbsup')
-    # with cols[2]:
-    #     y = st.button(':thumbsdown:', args=('Negative',), key='thumbsdown')
-    
-    # FB_text = st.text_input(
-    #     "Optional feedback",
-    #     label_visibility=st.session_state.visibility,
-    #     disabled=st.session_state.disabled,
-    #     placeholder=st.session_state.placeholder,
-    # )
-
-    
-    # if x:
-    #     feedback=1.0
-    # elif y:
-    #     feedback=0.0
-
-    # if feedback is not None:
-    #     client.create_feedback(
-    #         run_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id),
-    #         key="User Feedback",
-    #         score=feedback,
-    #         comment=FB_text,
-    #     )
+        if feedback is not None:
+            client.create_feedback(
+                run_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id),
+                key="User Feedback",
+                score=feedback['score'],
+                comment=feedback['text'],
+            )
