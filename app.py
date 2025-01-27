@@ -142,12 +142,7 @@ if user_input:
 
 feedback=None
 if st.session_state.chat_history:
-    feedback = streamlit_feedback(
-        feedback_type="thumbs",
-        optional_text_label="[Optional] Please provide an explanation",
-    )
-
-    if feedback:
+    if streamlit_feedback(feedback_type="thumbs",optional_text_label="[Optional] Please provide an explanation"):
         client.create_feedback(
             run_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id),
             key="User Feedback",
