@@ -187,7 +187,6 @@ if st.session_state.chat_history:
     cols = st.columns([0.1, 1, 1, 6])
     with cols[1]:
         x = st.button(':thumbsup:', args=('Positive',), key='thumbsup')
-        x_text = st.text_input("feedback", key='x_text')
     with cols[2]:
         y = st.button(':thumbsdown:', args=('Negative',), key='thumbsdown')
     
