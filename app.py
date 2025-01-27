@@ -183,39 +183,13 @@ if user_input:
 #         )
 
 if st.session_state.chat_history:
-    feedback_plaeceholder = st.empty()
-    with feedback_plaeceholder.form("my_form"):
-        st.write("Your feedback")
-        feedback = None
-        FB_text = None
-        cols = st.columns([0.1, 1, 1, 6])
-        with cols[1]:
-            x = st.button(':thumbsup:', args=('Positive',), key='thumbsup')
-        with cols[2]:
-            y = st.button(':thumbsdown:', args=('Negative',), key='thumbsdown')
+    feedback = streamlit_feedback(
+        feedback_type="thumbs",
+        optional_text_label="[Optional] Please provide an explanation",
+    )
 
-        if x:
-            feedback=1.0
-        elif y:
-            feedback=0.0
-
-        FB_text = st.text_input(
-            "Optional feedback",
-            label_visibility=st.session_state.visibility,
-            disabled=st.session_state.disabled,
-            placeholder=st.session_state.placeholder,
-        )
-
-        # Every form must have a submit button.
-        submitted = st.form_submit_button("Submit")
-        if submitted:
-            if feedback is not None:
-                client.create_feedback(
-                    run_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id),
-                    key="User Feedback",
-                    score=feedback,
-                    comment=FB_text,
-                )
+    if feedback:
+        st.write(feedback)
     # feedback = None
     # FB_text = None
     # cols = st.columns([0.1, 1, 1, 6])
