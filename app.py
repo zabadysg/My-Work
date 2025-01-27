@@ -108,10 +108,7 @@ user_input = st.chat_input(placeholder="Your message")
 user_input_2 = user_input
 
 
-# session_id = str(uuid4())
-# def session_func():
-#     return session_id
-# session_id_n = session_func()
+
 if uploaded_file is not None:
     text = extract_pdf_text(uploaded_file)
     if user_input:
@@ -145,6 +142,7 @@ if user_input:
 
 
 if st.session_state.chat_history:
+    feedback=None
     feedback = streamlit_feedback(
         feedback_type="thumbs",
         optional_text_label="[Optional] Please provide an explanation",
