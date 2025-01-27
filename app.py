@@ -23,7 +23,7 @@ load_dotenv()
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
 os.environ["LANGCHAIN_PROJECT"] = os.getenv("LANGCHAIN_PROJECT")
-client = Client(api_key="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")
+client = Client()
 
 
 with st.sidebar:
