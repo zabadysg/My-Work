@@ -187,8 +187,11 @@ if st.session_state.chat_history:
     cols = st.columns([0.1, 1, 1, 6])
     with cols[1]:
         x = st.button(':thumbsup:', args=('Positive',), key='thumbsup')
+        x_text = st.text_input("feedback", key='x_text')
     with cols[2]:
         y = st.button(':thumbsdown:', args=('Negative',), key='thumbsdown')
+    
+    FB_text = st.text_input("feedback",value="Optional feedback")
     
     if x:
         feedback=1.0
@@ -198,7 +201,7 @@ if st.session_state.chat_history:
     if feedback is not None:
         client.create_feedback(
             run_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id),
-            key="is_good",
+            key="User Feedback",
             score=feedback,
+            comment=FB_text,
         )
-        print(uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id))
