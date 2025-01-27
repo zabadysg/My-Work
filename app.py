@@ -189,7 +189,7 @@ if st.session_state.chat_history:
     )
 
     if feedback:
-        st.write(feedback)
+        st.write(feedback["score"])
     # feedback = None
     # FB_text = None
     # cols = st.columns([0.1, 1, 1, 6])
