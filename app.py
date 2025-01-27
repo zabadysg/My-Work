@@ -141,7 +141,7 @@ if user_input:
 
 
 
-if st.session_state.chat_history:
+if response_placeholder:
     feedback=None
     feedback = streamlit_feedback(
         feedback_type="thumbs",
