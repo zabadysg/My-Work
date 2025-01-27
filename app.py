@@ -131,6 +131,8 @@ if user_input:
 
         response_placeholder = st.empty()
         full_response = ""
+        feedback=None
+
         for response in bot_func(bot, user_input, session_id=session_id,langsmith_extra={"run_id":session_id}): 
             full_response += response 
             response_placeholder.markdown(f"{full_response}")
@@ -138,11 +140,10 @@ if user_input:
 
     st.session_state.chat_history.append(("You", f"{user_input_2}"))
     st.session_state.chat_history.append((selected_bot, f"{full_response}"))  
+    feedback = streamlit_feedback(feedback_type="thumbs",optional_text_label="[Optional] Please provide an explanation")
 
 
-feedback=None
-if st.session_state.chat_history:
-    if streamlit_feedback(feedback_type="thumbs",optional_text_label="[Optional] Please provide an explanation"):
+    if feedback:
         client.create_feedback(
             run_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id),
             key="User Feedback",
