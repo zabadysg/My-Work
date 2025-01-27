@@ -154,6 +154,6 @@ if st.session_state.chat_history:
         client.create_feedback(
             run_id=uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history)/2)-1)+user_id),
             key="User Feedback",
-            score=feedback['score'],
+            score=1 if feedback['score']=='👍' else 0,
             comment=feedback['text'],
         )
