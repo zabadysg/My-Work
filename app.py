@@ -22,13 +22,6 @@ load_dotenv()
 
 client = Client()
 
-def _submit_feedback(user_response):
-    client.create_feedback(
-        run_id=run_id,
-        key="User Feedback",
-        score=1.0 if user_response['score'] == "👍" else 0.0,
-        comment=user_response['text'],
-    )
 
 with st.sidebar:
     st.header("LLM Settings")
