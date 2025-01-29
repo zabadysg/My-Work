@@ -52,6 +52,9 @@ def read_db(filepath: str, embeddings_name):
     return retreiver
 
 
+
+
+
 def read_system_prompt(filepath: str):
     """
     Function to read the system prompt

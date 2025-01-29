@@ -22,6 +22,13 @@ load_dotenv()
 
 client = Client()
 
+def _submit_feedback(user_response):
+    client.create_feedback(
+        run_id=run_id,
+        key="User Feedback",
+        score=1.0 if user_response['score'] == "👍" else 0.0,
+        comment=user_response['text'],
+    )
 
 with st.sidebar:
     st.header("LLM Settings")
@@ -44,7 +51,7 @@ with st.sidebar:
             "meta-llama/Llama-3.3-70B-Instruct-Turbo",
             key="model_name",
         )
-        llm = ChatTogether(model=model_name, temperature=temperature)
+        llm = ChatTogether(model=model_name, temperature=temperature,api_key="5b52198e05ba384d730632b997cd3b18cb2b9e2d8f15ff627f995196121de00c",max_tokens=1)
 
     # Display the final llm variable
     st.subheader("LLM Variable")
@@ -96,6 +103,8 @@ if "bot_histories" not in st.session_state:
 if "selected_bot" not in st.session_state:
     st.session_state.selected_bot = None
 
+if "user_feedback" not in st.session_state:
+    st.session_state.user_feedback = None
 
 if selected_bot != st.session_state.selected_bot:
     if st.session_state.selected_bot is not None:  # Save the current bot's chat history
@@ -121,12 +130,11 @@ for sender, message in st.session_state.chat_history:
     with st.chat_message("user" if sender == "You" else "assistant"):
         st.markdown(message)
 
-session_id = uuid.uuid5(
-    uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history) / 2)) + user_id
-)
+session_id = uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history) / 2)) + user_id)
 
 
 if user_input:
+    st.session_state.user_feedback = None
 
     with st.chat_message("user"):
         st.markdown(f"{user_input_2}")
@@ -149,29 +157,19 @@ if user_input:
     st.session_state.chat_history.append((selected_bot, f"{full_response}"))
 
 if st.session_state.chat_history:
-    feedback = None
-    cols = st.columns([6, 0.1, 1, 1])
-    with cols[2]:
-        x = st.button(":thumbsup:", args=("Positive",), key="thumbsup")
-    with cols[3]:
-        y = st.button(":thumbsdown:", args=("Negative",), key="thumbsdown")
-    with cols[0]:
-        comment = st.text_area(
-            "", placeholder="(Optional) Leave a comment before selecting your choose:"
-        )
-
-    if x:
-        feedback = 1.0
-    elif y:
-        feedback = 0.0
-
-    if feedback is not None:
-        client.create_feedback(
-            run_id=uuid.uuid5(
+    run_id=uuid.uuid5(
                 uuid.NAMESPACE_DNS,
-                str((len(st.session_state.chat_history) / 2) - 1) + user_id,
-            ),
+                str((len(st.session_state.chat_history) / 2) - 1) + user_id)
+    streamlit_feedback(
+        feedback_type="thumbs",
+        optional_text_label="[Optional] Please provide an explanation",
+        align="flex-start",
+        key="user_feedback",
+    )
+    if st.session_state.user_feedback:
+        client.create_feedback(
+            run_id=run_id,
             key="is_good",
-            score=feedback,
-            comment=comment,
+            score=1.0 if st.session_state.user_feedback['score'] == "👍" else 0.0,
+            comment=st.session_state.user_feedback['text'],
         )
