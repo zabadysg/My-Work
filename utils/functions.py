@@ -19,7 +19,7 @@ from langchain_together import ChatTogether
 from langsmith import traceable, trace
 from uuid import uuid4
 
-# user_id=str(uuid4())
+user_id=str(uuid4())
 # def create_user_id():
 #     return user_id
 
