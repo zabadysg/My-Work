@@ -21,6 +21,8 @@ load_dotenv()
 
 client = Client()
 
+if len(st.session_state.chat_history)<1:
+    st.cache_data.clear()
 with st.sidebar:
     st.header("LLM Settings")
 
@@ -97,6 +99,9 @@ if "selected_bot" not in st.session_state:
 if "user_feedback" not in st.session_state:
     st.session_state.user_feedback = None
 
+if "user_id" not in st.session_state:
+    st.session_state.user_id = str(uuid4())
+
 if selected_bot != st.session_state.selected_bot:
     if st.session_state.selected_bot is not None:  # Save the current bot's chat history
         st.session_state.bot_histories[st.session_state.selected_bot] = (
@@ -121,7 +126,7 @@ for sender, message in st.session_state.chat_history:
     with st.chat_message("user" if sender == "You" else "assistant"):
         st.markdown(message)
 
-session_id = uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history) / 2)) + user_id)
+session_id = uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history) / 2)) + st.session_state.user_id)
 
 
 if user_input:
@@ -150,7 +155,7 @@ if user_input:
 if st.session_state.chat_history:
     run_id=uuid.uuid5(
                 uuid.NAMESPACE_DNS,
-                str((len(st.session_state.chat_history) / 2) - 1) + user_id)
+                str((len(st.session_state.chat_history) / 2) - 1) + st.session_state.user_id)
     streamlit_feedback(
         feedback_type="thumbs",
         optional_text_label="[Optional] Please provide an explanation",
