@@ -19,7 +19,7 @@ from langchain_together import ChatTogether
 from langsmith import traceable, trace
 from uuid import uuid4
 
-# user_id=str(uuid4())
+user_id=str(uuid4())
 # def create_user_id():
 #     return user_id
 
@@ -140,7 +140,6 @@ def _reduce_chunks(chunks: list):
 
 # def feedback(feedback_text):
 #     return feedback_text
-user_id = str(uuid4())
 
 
 @traceable(name="zabady", reduce_fn=_reduce_chunks, metadata={"user_id": user_id})
