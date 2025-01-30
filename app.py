@@ -21,8 +21,7 @@ load_dotenv()
 
 client = Client()
 
-if "chat_history" not in st.session_state:
-    st.cache_data.clear()
+
 with st.sidebar:
     st.header("LLM Settings")
 
@@ -34,11 +33,13 @@ with st.sidebar:
 
     # Conditional inputs based on model type
     if model_type == "CustomLLM":
+        st.cache_data.clear()
         api_url = st.text_input(
             "Enter API URL", "http://34.68.15.213:8000/chat_stream", key="api_url"
         )
         llm = CustomLLM(api_url=api_url)
     elif model_type == "ChatTogether":
+        st.cache_data.clear()
         model_name = st.text_input(
             "Enter Model Name",
             "meta-llama/Llama-3.3-70B-Instruct-Turbo",
