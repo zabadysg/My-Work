@@ -21,7 +21,7 @@ load_dotenv()
 
 client = Client()
 
-if len(st.session_state.chat_history)<1:
+if "chat_history" not in st.session_state:
     st.cache_data.clear()
 with st.sidebar:
     st.header("LLM Settings")
