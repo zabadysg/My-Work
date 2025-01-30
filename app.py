@@ -165,7 +165,7 @@ if st.session_state.chat_history:
     if st.session_state.user_feedback:
         client.create_feedback(
             run_id=run_id,
-            key="is_good",
+            key="User Feedback",
             score=1.0 if st.session_state.user_feedback['score'] == "👍" else 0.0,
             comment=st.session_state.user_feedback['text'],
         )
