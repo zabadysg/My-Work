@@ -100,8 +100,8 @@ if "selected_bot" not in st.session_state:
 if "user_feedback" not in st.session_state:
     st.session_state.user_feedback = None
 
-if "user_id" not in st.session_state:
-    st.session_state.user_id = str(uuid4())
+# if "user_id" not in st.session_state:
+#     st.session_state.user_id = str(uuid4())
 
 if selected_bot != st.session_state.selected_bot:
     if st.session_state.selected_bot is not None:  # Save the current bot's chat history
@@ -127,7 +127,7 @@ for sender, message in st.session_state.chat_history:
     with st.chat_message("user" if sender == "You" else "assistant"):
         st.markdown(message)
 
-session_id = uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history) / 2)) + st.session_state.user_id)
+session_id = uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history) / 2)) + user_id)
 
 
 if user_input:
@@ -156,7 +156,7 @@ if user_input:
 if st.session_state.chat_history:
     run_id=uuid.uuid5(
                 uuid.NAMESPACE_DNS,
-                str((len(st.session_state.chat_history) / 2) - 1) + st.session_state.user_id)
+                str((len(st.session_state.chat_history) / 2) - 1) + user_id)
     streamlit_feedback(
         feedback_type="thumbs",
         optional_text_label="[Optional] Please provide an explanation",
