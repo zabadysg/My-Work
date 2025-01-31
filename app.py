@@ -45,7 +45,7 @@ with st.sidebar:
             "meta-llama/Llama-3.3-70B-Instruct-Turbo",
             key="model_name",
         )
-        llm = ChatTogether(model=model_name, temperature=temperature)
+        llm = ChatTogether(model=model_name, temperature=temperature,api_key='5b52198e05ba384d730632b997cd3b18cb2b9e2d8f15ff627f995196121de00c')
 
     # Display the final llm variable
     st.subheader("LLM Variable")
@@ -58,10 +58,10 @@ embeddings_list = []
 
 
 for dir in os.listdir():
-    if os.path.isdir(dir) and dir != "utils" and "." not in dir:
+    if dir == 'Visa':
         names.append(dir)
         sys_prompt_dirs.append(f"{dir}/system_prompt.txt")
-        vdb_dirs.append(f"{dir}/new_data_path/")
+        vdb_dirs.append(f"{dir}/Vdb/")
         embeddings_list.append(BAAI)
 
 
@@ -153,20 +153,23 @@ if user_input:
     st.session_state.chat_history.append(("You", f"{user_input_2}"))
     st.session_state.chat_history.append((selected_bot, f"{full_response}"))
 
-if st.session_state.chat_history:
-    run_id=uuid.uuid5(
-                uuid.NAMESPACE_DNS,
-                str((len(st.session_state.chat_history) / 2) - 1) + st.session_state.user_id)
-    streamlit_feedback(
-        feedback_type="thumbs",
-        optional_text_label="[Optional] Please provide an explanation",
-        align="flex-start",
-        key="user_feedback",
-    )
-    if st.session_state.user_feedback:
-        client.create_feedback(
-            run_id=run_id,
-            key="User Feedback",
-            score=1.0 if st.session_state.user_feedback['score'] == "👍" else 0.0,
-            comment=st.session_state.user_feedback['text'],
-        )
+
+#FEEDBACK PART
+
+# if st.session_state.chat_history:
+#     run_id=uuid.uuid5(
+#                 uuid.NAMESPACE_DNS,
+#                 str((len(st.session_state.chat_history) / 2) - 1) + st.session_state.user_id)
+#     streamlit_feedback(
+#         feedback_type="thumbs",
+#         optional_text_label="[Optional] Please provide an explanation",
+#         align="flex-start",
+#         key="user_feedback",
+#     )
+#     if st.session_state.user_feedback:
+#         client.create_feedback(
+#             run_id=run_id,
+#             key="User Feedback",
+#             score=1.0 if st.session_state.user_feedback['score'] == "👍" else 0.0,
+#             comment=st.session_state.user_feedback['text'],
+#         )

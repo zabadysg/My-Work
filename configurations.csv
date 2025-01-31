@@ -1,2 +1,2 @@
 name,embeddings_name,vdb_dir,sys_prompt_dir
-filtration,BAAI/bge-base-en-v1.5,filtration/new_data_path/,filtration/system_prompt.txt
+Visa,BAAI/bge-base-en-v1.5,Visa/Vdb/,Visa/system_prompt.txt
