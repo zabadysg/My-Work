@@ -45,7 +45,7 @@ with st.sidebar:
             "meta-llama/Llama-3.3-70B-Instruct-Turbo",
             key="model_name",
         )
-        llm = ChatTogether(model=model_name, temperature=temperature)
+        llm = ChatTogether(model=model_name, temperature=temperature,max_tokens=1)
 
     # Display the final llm variable
     st.subheader("LLM Variable")
