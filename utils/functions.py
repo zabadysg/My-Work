@@ -143,7 +143,7 @@ def _reduce_chunks(chunks: list):
 
 
 @traceable(name="zabady", reduce_fn=_reduce_chunks, metadata={"user_id": user_id})
-def bot_func(rag_chain, user_input, session_id):
+def bot_func(rag_chain, user_input, session_id,langsmith_extra=None):
 
     for chunk in rag_chain.stream(
         {"input": user_input}, config={"configurable": {"session_id": session_id}}

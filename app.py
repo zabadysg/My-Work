@@ -58,7 +58,7 @@ embeddings_list = []
 
 
 for dir in os.listdir():
-    if dir == 'Visa':
+    if os.path.isdir(dir) and dir != "utils" and "." not in dir and dir != "additional data" and dir != "Visa":
         names.append(dir)
         sys_prompt_dirs.append(f"{dir}/system_prompt.txt")
         vdb_dirs.append(f"{dir}/Vdb/")

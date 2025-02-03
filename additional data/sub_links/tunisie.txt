@@ -34,7 +34,7 @@
 /etudiant-mineur-scolarise-dans-un-etablissement-superieur-francais
 /fermeture-campus-france-2728-et-29-septembre-2023
 /01-septembre-2023-nouveaux-horaires-d-ouverture-au-public
-/la-nouvelle-plateforme-mon-master-fonctionnalites-et-candidats-concernes
+/la-plateforme-mon-master-fonctionnalites-et-candidats-concernes
 /calendrier-interactif-campagne-de-candidature-20232024
 /fermeture-campus-france-25-juillet-2023
 /procedure-campus-france-tls-contact-mise-a-jour
@@ -174,7 +174,7 @@
 /nouveaute-paiement-en-ligne-ou-sur-place-par-carte-bancaire-a-partir-du-15-janvier-2021
 /proceder-au-paiement-des-frais-de-dossier
 /atelier-campus-france-sfax-programme-janvier-2021
-/but-ex-dut-ce-qu-il-faut-savoir-sur-ce-diplome
+/but-ce-qu-il-faut-savoir-sur-ce-diplome
 /atelier-campus-france-sousse-programme-janvier-2021
 /fermeture-campus-france-fetes-de-fin-d-annee-2020
 /nos-videos-et-tutoriels-personnalises
@@ -275,7 +275,7 @@
 /verifier-la-liste-officielle-des-traducteurs
 /agenda/atelier-aide-a-la-creation-de-compte-sur-la-plateforme-etudes-en-france
 /agenda/ateliers-comment-remplir-son-dossier-de-candidature-etudes-en-france
-/les-etudes-de-sante-en-france-ex-paces
+/les-etudes-de-sante-en-france
 /atelier-campus-france-sousse-programme-novembre-2019
 /je-suis-accepte-dans-un-etablissement-francais
 /doctorat
