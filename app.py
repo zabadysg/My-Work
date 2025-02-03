@@ -77,7 +77,7 @@ df.to_csv("configurations.csv", index=False)
 
 
 selected_bot = st.sidebar.selectbox("Choose a bot to interact with:", list(df["name"]))
-st.write(f"{selected_bot} school Bot")
+st.write(f"{selected_bot} Visa Bot")
 
 selected_bot_config = df[df["name"] == selected_bot].iloc[0]
 bot = create_bot_for_selected_bot(
