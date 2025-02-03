@@ -20,6 +20,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 client = Client()
+st.cache_data.clear()
+st.cache_resource.clear()
+
 
 
 with st.sidebar:
