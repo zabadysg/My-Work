@@ -181,7 +181,7 @@ def main():
             
             # Capture the run_id for feedback
             current_run = langsmith_client.list_runs(
-                project_name="sg-program-explorer", 
+                project_name="my-visa-bot", 
                 execution_order=1, 
                 limit=1
             )
