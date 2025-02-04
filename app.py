@@ -180,42 +180,42 @@ def main():
             # Invoke traceable RAG chain
             
             # Capture the run_id for feedback
-            current_run = langsmith_client.list_runs(
-                project_name="my-visa-bot", 
-                execution_order=1, 
-                limit=1
-            )
+            # current_run = langsmith_client.list_runs(
+            #     project_name="my-visa-bot", 
+            #     execution_order=1, 
+            #     limit=1
+            # )
             
-            if current_run:
-                st.session_state.current_run_id = current_run[0].id
+            # if current_run:
+            #     st.session_state.current_run_id = current_run[0].id
 
         # Update chat history
         st.session_state.chat_history.append(("You", user_input))
         st.session_state.chat_history.append(("Assistant", full_response))
 
         # Feedback Section
-        if st.session_state.current_run_id:
-            st.markdown("### Provide Feedback")
-            feedback_col1, feedback_col2 = st.columns(2)
+        # if st.session_state.current_run_id:
+        #     st.markdown("### Provide Feedback")
+        #     feedback_col1, feedback_col2 = st.columns(2)
             
-            with feedback_col1:
-                feedback_score = st.select_slider(
-                    "Rate the response:", 
-                    options=[1, 2, 3, 4, 5],
-                    value=3
-                )
+        #     with feedback_col1:
+        #         feedback_score = st.select_slider(
+        #             "Rate the response:", 
+        #             options=[1, 2, 3, 4, 5],
+        #             value=3
+        #         )
             
-            with feedback_col2:
-                feedback_text = st.text_input("Additional comments (optional)")
+        #     with feedback_col2:
+        #         feedback_text = st.text_input("Additional comments (optional)")
             
-            if st.button("Submit Feedback"):
-                if submit_feedback(
-                    st.session_state.current_run_id, 
-                    feedback_score, 
-                    feedback_text,
-                    st.session_state.user_name
-                ):
-                    st.success("Feedback submitted successfully!")
+        #     if st.button("Submit Feedback"):
+        #         if submit_feedback(
+        #             st.session_state.current_run_id, 
+        #             feedback_score, 
+        #             feedback_text,
+        #             st.session_state.user_name
+        #         ):
+        #             st.success("Feedback submitted successfully!")
 
 # Run the Streamlit app
 if __name__ == "__main__":
