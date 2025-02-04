@@ -10,7 +10,7 @@ from utils.customllm import *
 from langsmith import traceable, trace, Client
 from typing import Final
 
-from langchain_openai import OpenAI
+from langchain_openai import ChatOpenAI
 from streamlit_feedback import streamlit_feedback
 
 
@@ -45,7 +45,7 @@ with st.sidebar:
             "gpt-4o-mini",
             key="model_name",
         )
-        llm = OpenAI(model=model_name, temperature=temperature)
+        llm = ChatOpenAI(model=model_name, temperature=temperature)
 
 msgs = StreamlitChatMessageHistory(key="langchain_messages")
 BAAI = "BAAI/bge-base-en-v1.5"
