@@ -19,10 +19,6 @@ from langchain_together import ChatTogether
 from langsmith import traceable, trace
 from uuid import uuid4
 
-user_id=str(uuid4())
-# def create_user_id():
-#     return user_id
-
 # control the temprature and the llm model type as input in the streamlit GUI
 
 # llm = ChatTogether(model= "meta-llama/Llama-3.3-70B-Instruct-Turbo", temperature=0.0)
@@ -133,23 +129,9 @@ def create_bot_for_selected_bot(
     return conversational_rag_chain
 
 
-def _reduce_chunks(chunks: list):
-    all_text = "".join([chunk for chunk in chunks])
-    return all_text
 
 
-# def feedback(feedback_text):
-#     return feedback_text
 
-
-@traceable(name="zabady", reduce_fn=_reduce_chunks, metadata={"user_id": user_id})
-def bot_func(rag_chain, user_input, session_id,langsmith_extra=None):
-
-    for chunk in rag_chain.stream(
-        {"input": user_input}, config={"configurable": {"session_id": session_id}}
-    ):
-        if answer_chunk := chunk.get("answer"):
-            yield answer_chunk
 
 
 def extract_pdf_text(file_object):

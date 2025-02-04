@@ -125,6 +125,20 @@ for sender, message in st.session_state.chat_history:
 
 session_id = uuid.uuid5(uuid.NAMESPACE_DNS, str((len(st.session_state.chat_history) / 2)) + st.session_state.user_id)
 
+def _reduce_chunks(chunks: list):
+    all_text = "".join([chunk for chunk in chunks])
+    return all_text
+
+
+@traceable(name="zabady", reduce_fn=_reduce_chunks, metadata={"user_id": st.session_state.user_id})
+def bot_func(rag_chain, user_input, session_id,langsmith_extra=None):
+
+    for chunk in rag_chain.stream(
+        {"input": user_input}, config={"configurable": {"session_id": session_id}}
+    ):
+        if answer_chunk := chunk.get("answer"):
+            yield answer_chunk
+
 
 if user_input:
     st.session_state.user_feedback = None
