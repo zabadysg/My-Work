@@ -47,10 +47,6 @@ with st.sidebar:
         )
         llm = OpenAI(model=model_name, temperature=temperature)
 
-    # Display the final llm variable
-    st.subheader("LLM Variable")
-    st.code(f"llm = {llm}")
-
 msgs = StreamlitChatMessageHistory(key="langchain_messages")
 BAAI = "BAAI/bge-base-en-v1.5"
 names, sys_prompt_dirs, vdb_dirs = [], [], []
