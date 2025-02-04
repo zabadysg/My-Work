@@ -140,8 +140,7 @@ def user_registration():
 
 # Streamlit App
 def main():
-    st.title("SG-Program Explorer")
-    st.image("assets/logo.png", width=200)
+    st.title("SG-VisaBot")
 
     # User Registration Check
     if 'user_name' not in st.session_state:
